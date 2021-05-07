@@ -1,21 +1,22 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const NotFoundError = require('../middleware/errors/not-found-err');
+const BadRequestError = require('../middleware/errors/bad-request-err');
+const UnauthorizedError = require('../middleware/errors/unauthorized-err');
+const ConflictError = require('../middleware/errors/conflict-err');
 
 function getUserInfo(req, res, next) {
   return User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        console.log(res);
-        throw new Error('User not found :(');
+        throw new NotFoundError('User not found');
       }
-      console.log(user);
       res.status(200).send(user);
     })
     .catch((err) => {
       if (err) {
-        console.log(res);
-        throw new Error('Invalid data input');
+        throw new BadRequestError('Invalid data input');
       }
     })
     .catch(next);
@@ -32,7 +33,7 @@ function createUser(req, res, next) {
       })
         .then((user) => {
           if (!user) {
-            throw new Error('Please put correct email or password');
+            throw new BadRequestError('Please put correct email or password');
           }
           res.status(201).send({
             name: user.name,
@@ -42,8 +43,7 @@ function createUser(req, res, next) {
         })
         .catch((err) => {
           if (err.code.toString() === '11000') {
-            console.log(err + 'asssaas!');
-            throw new Error('Please create a unique user');
+            throw new ConflictError('Please create a unique user');
           }
         }),
     )
@@ -56,7 +56,7 @@ function login(req, res, next) {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
-        throw new Error('User not found');
+        throw new NotFoundError('User not found');
       }
       const token = jwt.sign({ _id: user._id }, 'alex-key', {
         expiresIn: '7d',
@@ -65,7 +65,7 @@ function login(req, res, next) {
     })
     .catch(() => {
       if (res.status(401)) {
-        throw new Error('Incorrect email or password');
+        throw new UnauthorizedError('Incorrect email or password');
       }
     })
     .catch(next);

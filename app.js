@@ -5,6 +5,7 @@ const { celebrate, Joi, errors } = require('celebrate');
 const { createUser, login } = require('./controllers/usersController');
 const auth = require('./middleware/auth');
 const { requestLogger, errorLogger } = require('./middleware/logger');
+const NotFoundError = require('./middleware/errors/not-found-err');
 
 const app = express();
 
@@ -46,7 +47,7 @@ app.post(
 );
 
 app.get('*', () => {
-  throw new Error(`This page doesn't exist`);
+  throw new NotFoundError(`This page doesn't exist`);
 });
 
 app.use(errorLogger);
