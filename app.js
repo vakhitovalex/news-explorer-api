@@ -6,6 +6,7 @@ const { createUser, login } = require('./controllers/usersController');
 const auth = require('./middleware/auth');
 const { requestLogger, errorLogger } = require('./middleware/logger');
 const NotFoundError = require('./middleware/errors/not-found-err');
+require('dotenv').config();
 
 const app = express();
 
@@ -20,10 +21,10 @@ mongoose.connect('mongodb://localhost:27017/news-explorer', {
 });
 // connect the middleware, routes, etc...
 const userRouter = require('./routes/users');
+const articleRouter = require('./routes/articles');
 
 app.use(requestLogger);
 app.use(bodyParser.json());
-app.use('/users', auth, userRouter);
 app.post(
   '/signup',
   celebrate({
@@ -45,13 +46,14 @@ app.post(
   }),
   login,
 );
+app.use('/articles', auth, articleRouter);
+app.use('/users', auth, userRouter);
 
 app.get('*', () => {
   throw new NotFoundError(`This page doesn't exist`);
 });
 
 app.use(errorLogger);
-
 app.use(errors());
 
 app.use((err, req, res, next) => {

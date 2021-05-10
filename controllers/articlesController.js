@@ -6,7 +6,7 @@ const Article = require('../models/article');
 // GET /articles
 function getArtciles(req, res, next) {
   return Article.find({})
-    .populate('article')
+    .populate('user')
     .then((articles) => {
       if (!articles) {
         throw new Error('Articles not found');
@@ -45,14 +45,18 @@ function createArticle(req, res, next) {
 //  deletes the stored article by _id
 // DELETE /articles/articleId
 function deleteArticle(req, res, next) {
-  return Article.findByIdAndRemove(req.params.articleId)
+  Article.findById(req.params.articleId)
+    .select('+owner')
     .then((article) => {
       if (!article) {
         throw new NotFoundError('Article was not found :(');
-      } else if (!article.owner._id.toString() === req.user._id) {
-        throw new ForbiddenError('Forbidden action, this article is not yours');
+      } else if (article.owner.toString() !== req.user._id) {
+        throw new ForbiddenError('Forbidden action, this is not your article');
+      } else {
+        Article.findByIdAndRemove(req.params.articleId).then(() => {
+          res.status(200).send(article);
+        });
       }
-      return res.status(200).send(article);
     })
     .catch(next);
 }
