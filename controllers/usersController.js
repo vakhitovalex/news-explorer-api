@@ -12,7 +12,10 @@ function getUserInfo(req, res, next) {
       if (!user) {
         throw new NotFoundError('User not found');
       }
-      res.status(200).send(user);
+      res.status(200).send({
+        name: user.name,
+        email: user.email,
+      });
     })
     .catch((err) => {
       if (err) {
