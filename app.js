@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { celebrate, Joi, errors } = require('celebrate');
+const rateLimit = require('express-rate-limit');
 const { createUser, login } = require('./controllers/usersController');
 const auth = require('./middleware/auth');
 const { requestLogger, errorLogger } = require('./middleware/logger');
@@ -19,9 +20,15 @@ mongoose.connect('mongodb://localhost:27017/news-explorer', {
   useFindAndModify: false,
   useUnifiedTopology: true,
 });
-// connect the middleware, routes, etc...
 const userRouter = require('./routes/users');
 const articleRouter = require('./routes/articles');
+
+app.set('trust proxy', 1);
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+app.use(limiter);
 
 app.use(requestLogger);
 app.use(bodyParser.json());
