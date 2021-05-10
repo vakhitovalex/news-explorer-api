@@ -3,10 +3,11 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { celebrate, Joi, errors } = require('celebrate');
 const rateLimit = require('express-rate-limit');
-const { createUser, login } = require('./controllers/usersController');
+const helmet = require('helmet');
 const auth = require('./middleware/auth');
 const { requestLogger, errorLogger } = require('./middleware/logger');
 const NotFoundError = require('./middleware/errors/not-found-err');
+const { createUser, login } = require('./controllers/usersController');
 require('dotenv').config();
 
 const app = express();
@@ -29,7 +30,7 @@ const limiter = rateLimit({
   max: 100, // limit each IP to 100 requests per windowMs
 });
 app.use(limiter);
-
+app.use(helmet());
 app.use(requestLogger);
 app.use(bodyParser.json());
 app.post(
