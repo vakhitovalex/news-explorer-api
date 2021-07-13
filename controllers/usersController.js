@@ -17,6 +17,7 @@ function getUserInfo(req, res, next) {
       res.status(200).send({
         name: user.name,
         email: user.email,
+        id: user.id,
       });
     })
     .catch((err) => {

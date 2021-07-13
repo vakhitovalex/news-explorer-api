@@ -24,9 +24,11 @@ const articleSchema = new mongoose.Schema({
   link: {
     type: String,
     required: true,
+    unique: true,
     validate: {
       validator(link) {
-        const linkRegex = /^(http|https):\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/i;
+        const linkRegex =
+          /^(http|https):\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/i;
         return linkRegex.test(link);
       },
       message: 'Sorry, your link is incorrect!',
@@ -37,7 +39,8 @@ const articleSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator(link) {
-        const linkRegex = /^(http|https):\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/i;
+        const linkRegex =
+          /^(http|https):\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/i;
         return linkRegex.test(link);
       },
       message: 'Sorry, your link is incorrect!',

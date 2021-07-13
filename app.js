@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { celebrate, Joi, errors } = require('celebrate');
 const helmet = require('helmet');
+const cors = require('cors');
 const auth = require('./middleware/auth');
 const { requestLogger, errorLogger } = require('./middleware/logger');
 const NotFoundError = require('./middleware/errors/not-found-err');
@@ -18,6 +19,7 @@ const userRouter = require('./routes/users');
 const articleRouter = require('./routes/articles');
 
 app.set('trust proxy', 1);
+app.use(cors());
 app.use(requestLogger);
 app.use(rateLimiter);
 app.use(helmet());
@@ -26,9 +28,9 @@ app.post(
   '/signup',
   celebrate({
     body: Joi.object().keys({
-      name: Joi.string().required().min(6).max(30),
       email: Joi.string().required().email(),
       password: Joi.string().required().min(6),
+      name: Joi.string().required().min(6).max(30),
     }),
   }),
   createUser,
